@@ -59,16 +59,20 @@ function setupMusic() {
   music.volume = 0.8;
 
   function applyPlaylist(data) {
-    const processedData = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-    
+    const processedData = data
+      ? Array.isArray(data)
+        ? data
+        : Object.values(data)
+      : [];
+
     if (processedData.length === 0) {
-      playlist = [{ title: 'A mortal music', src: 'A mortal music.mp3' }];
+      playlist = [{ title: "A mortal music", src: "A mortal music.mp3" }];
     } else {
       playlist = processedData;
     }
 
     if (currentTrack >= playlist.length) currentTrack = 0;
-    
+
     if (!_trackReady && playlist.length > 0) {
       _trackReady = true;
       loadTrack(currentTrack, false); // Don't autoplay yet
@@ -78,24 +82,24 @@ function setupMusic() {
   function loadTrack(index, shouldPlay = true) {
     if (index < 0 || index >= playlist.length) return;
     currentTrack = index;
-    
+
     const track = playlist[currentTrack];
     let trackSrc = track.src;
 
     // Only encode if it's NOT a full URL (Firebase URLs are already encoded)
-    if (!trackSrc.startsWith('http')) {
-        // Safe encoding for local paths with spaces
-        trackSrc = encodeURI(trackSrc);
+    if (!trackSrc.startsWith("http")) {
+      // Safe encoding for local paths with spaces
+      trackSrc = encodeURI(trackSrc);
     }
-    
+
     music.src = trackSrc;
     currentTrackTitle.textContent = track.title;
-    
+
     music.load();
     if (shouldPlay) {
-      music.play().catch(err => {
-          console.warn("Playback blocked or failed:", err);
-          updateUI(); // Ensure UI stays in sync if play fails
+      music.play().catch((err) => {
+        console.warn("Playback blocked or failed:", err);
+        updateUI(); // Ensure UI stays in sync if play fails
       });
     }
   }
@@ -117,8 +121,9 @@ function setupMusic() {
   }
 
   function updateUI() {
-    const isActuallyPlaying = !music.paused && !music.ended && music.readyState > 2;
-    
+    const isActuallyPlaying =
+      !music.paused && !music.ended && music.readyState > 2;
+
     if (isActuallyPlaying) {
       musicIcon.className = "fas fa-pause text-white";
       toggleMusicPlayer.classList.add("music-playing");
@@ -137,7 +142,7 @@ function setupMusic() {
     }
 
     if (music.paused) {
-      music.play().catch(err => {
+      music.play().catch((err) => {
         console.error("Manual play failed:", err);
         // Retry with a fresh load if error
         loadTrack(currentTrack, true);
@@ -153,9 +158,13 @@ function setupMusic() {
     togglePlayPause();
   });
 
-  nextBtn.addEventListener("click", () => loadTrack((currentTrack + 1) % playlist.length));
-  prevBtn.addEventListener("click", () => loadTrack((currentTrack - 1 + playlist.length) % playlist.length));
-  
+  nextBtn.addEventListener("click", () =>
+    loadTrack((currentTrack + 1) % playlist.length),
+  );
+  prevBtn.addEventListener("click", () =>
+    loadTrack((currentTrack - 1 + playlist.length) % playlist.length),
+  );
+
   toggleMusicPlayer.addEventListener("click", () => {
     isPlayerVisible = !isPlayerVisible;
     musicPlayer.classList.toggle("show", isPlayerVisible);
@@ -170,24 +179,29 @@ function setupMusic() {
   }
 
   if (volumeControl) {
-    volumeControl.addEventListener("input", (e) => music.volume = e.target.value / 100);
+    volumeControl.addEventListener(
+      "input",
+      (e) => (music.volume = e.target.value / 100),
+    );
   }
-  
+
   // Audio state listeners
   music.addEventListener("timeupdate", updateProgress);
-  music.addEventListener("ended", () => loadTrack((currentTrack + 1) % playlist.length));
+  music.addEventListener("ended", () =>
+    loadTrack((currentTrack + 1) % playlist.length),
+  );
   music.addEventListener("play", updateUI);
   music.addEventListener("pause", updateUI);
   music.addEventListener("playing", updateUI);
   music.addEventListener("canplay", updateUI);
-  
+
   music.addEventListener("error", () => {
     console.error("Audio error. Path might be wrong:", music.src);
     currentTrackTitle.textContent = "Error loading music";
   });
 
   // Data Listeners
-  document.addEventListener('firebase:music', (e) => applyPlaylist(e.detail));
+  document.addEventListener("firebase:music", (e) => applyPlaylist(e.detail));
   if (window._firebaseMusic) applyPlaylist(window._firebaseMusic);
 
   // Keyboard
@@ -232,6 +246,17 @@ function setupSmoothScrolling() {
       }
     });
   });
+
+  // Close mobile menu when admin button is clicked
+  const adminBtn = document.querySelector(".admin-nav-btn");
+  if (adminBtn) {
+    adminBtn.addEventListener("click", () => {
+      const mobileMenu = document.getElementById("mobile-menu");
+      if (!mobileMenu.classList.contains("hidden")) {
+        mobileMenu.classList.add("hidden");
+      }
+    });
+  }
 }
 
 // Schedule day tabs
@@ -261,26 +286,32 @@ function setupScheduleTabs() {
     });
   });
 
-  document.addEventListener('firebase:schedule', (e) => {
+  document.addEventListener("firebase:schedule", (e) => {
     const schedules = e.detail || [];
-    const days = ['senin', 'selasa', 'rabu', 'kamis', 'Jumat', 'Sabtu'];
-    days.forEach(day => {
+    const days = ["senin", "selasa", "rabu", "kamis", "Jumat", "Sabtu"];
+    days.forEach((day) => {
       const table = document.getElementById(`${day}-schedule`);
-      if(table) {
-        const tbody = table.querySelector('tbody');
-        if(tbody) {
-          const daySchedules = schedules.filter(s => s.day === day).sort((a,b) => (a.time||'').localeCompare(b.time||''));
-          if(daySchedules.length === 0) {
+      if (table) {
+        const tbody = table.querySelector("tbody");
+        if (tbody) {
+          const daySchedules = schedules
+            .filter((s) => s.day === day)
+            .sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+          if (daySchedules.length === 0) {
             tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-400">Belum ada jadwal</td></tr>`;
           } else {
-            tbody.innerHTML = daySchedules.map(s => `
+            tbody.innerHTML = daySchedules
+              .map(
+                (s) => `
               <tr class="hover:bg-gray-700">
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-purple-300">${s.time}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${s.course}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${s.lecturer}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${s.room}</td>
               </tr>
-            `).join('');
+            `,
+              )
+              .join("");
           }
         }
       }
@@ -312,42 +343,46 @@ function setupGalleryFilter() {
   });
 
   function filterGalleryGrid() {
-      if(!galleryGrid) return;
-      const galleryItems = galleryGrid.querySelectorAll(".gallery-item");
-      galleryItems.forEach((item) => {
-        if (
-          currentCategory === "all" ||
-          item.getAttribute("data-category") === currentCategory
-        ) {
-          item.style.display = "block";
-        } else {
-          item.style.display = "none";
-        }
-      });
+    if (!galleryGrid) return;
+    const galleryItems = galleryGrid.querySelectorAll(".gallery-item");
+    galleryItems.forEach((item) => {
+      if (
+        currentCategory === "all" ||
+        item.getAttribute("data-category") === currentCategory
+      ) {
+        item.style.display = "block";
+      } else {
+        item.style.display = "none";
+      }
+    });
   }
 
-  document.addEventListener('firebase:gallery', (e) => {
-      const galleries = e.detail || [];
-      if(!galleryGrid) return;
+  document.addEventListener("firebase:gallery", (e) => {
+    const galleries = e.detail || [];
+    if (!galleryGrid) return;
 
-      if(galleries.length === 0) {
-          galleryGrid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-8">Belum ada foto di galeri.</div>`;
-          return;
-      }
+    if (galleries.length === 0) {
+      galleryGrid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-8">Belum ada foto di galeri.</div>`;
+      return;
+    }
 
-      galleryGrid.innerHTML = galleries.map(g => `
+    galleryGrid.innerHTML = galleries
+      .map(
+        (g) => `
             <div data-category="${g.category}" class="gallery-item relative group overflow-hidden rounded-xl shadow-lg">
               <img src="${g.photo}" alt="${g.title}" class="w-full h-40 sm:h-48 md:h-56 lg:h-64 object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.src='https://via.placeholder.com/400x300?text=Not+Found'">
               <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-80 transition-opacity flex items-end p-4">
                 <div>
                   <h3 class="text-white font-bold">${g.title}</h3>
-                  <p class="text-gray-300 text-sm">${g.date || ''}</p>
+                  <p class="text-gray-300 text-sm">${g.date || ""}</p>
                 </div>
               </div>
             </div>
-      `).join('');
+      `,
+      )
+      .join("");
 
-      filterGalleryGrid();
+    filterGalleryGrid();
   });
 }
 
@@ -380,12 +415,12 @@ function setupSlideshow() {
   function showSlide(n) {
     const slides = container.querySelectorAll(".slide");
     if (slides.length === 0) return;
-    
+
     slides.forEach((slide) => {
       slide.classList.add("opacity-0");
       slide.classList.remove("opacity-100");
     });
-    
+
     currentSlide = n % slides.length;
     slides[currentSlide].classList.remove("opacity-0");
     slides[currentSlide].classList.add("opacity-100");
@@ -435,12 +470,12 @@ function setupCalendar() {
     const firstDay = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
-      1
+      1,
     );
     const lastDay = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth() + 1,
-      0
+      0,
     );
     const totalDays = lastDay.getDate();
     const startingDay = firstDay.getDay();
@@ -452,7 +487,7 @@ function setupCalendar() {
         "h-10",
         "flex",
         "items-center",
-        "justify-center"
+        "justify-center",
       );
       calendarDaysEl.appendChild(dayElement);
     }
@@ -466,7 +501,7 @@ function setupCalendar() {
         "items-center",
         "justify-center",
         "cursor-pointer",
-        "relative"
+        "relative",
       );
       dayElement.textContent = i;
 
@@ -492,7 +527,7 @@ function setupCalendar() {
           "-translate-x-1/2",
           "flex",
           "justify-center",
-          "space-x-1"
+          "space-x-1",
         );
 
         for (let j = 0; j < randomEvents; j++) {
@@ -562,7 +597,7 @@ function setupMembers() {
   let visibleMembers = 5;
 
   function renderMembers() {
-    if(!membersList) return;
+    if (!membersList) return;
     membersList.innerHTML = "";
 
     const searchTerm = memberSearch ? memberSearch.value.toLowerCase() : "";
@@ -570,44 +605,47 @@ function setupMembers() {
       .filter(
         (member) =>
           (member.name && member.name.toLowerCase().includes(searchTerm)) ||
-          (member.nim && member.nim.toLowerCase().includes(searchTerm))
+          (member.nim && member.nim.toLowerCase().includes(searchTerm)),
       )
       .slice(0, visibleMembers);
 
     if (filteredMembers.length === 0 && memberData.length > 0) {
-       membersList.innerHTML = `<div class="col-span-full text-center text-gray-400 py-8">Tidak ada anggota yang cocok dengan pencarian.</div>`;
+      membersList.innerHTML = `<div class="col-span-full text-center text-gray-400 py-8">Tidak ada anggota yang cocok dengan pencarian.</div>`;
     }
 
     filteredMembers.forEach((member) => {
       const memberElement = document.createElement("div");
       memberElement.className =
         "member-card bg-gray-800 rounded-xl p-4 text-center shadow-lg hover:shadow-purple-500/20 transition-all fade-in";
-      
-      const photoSrc = member.photo && member.photo !== '.jpg' ? member.photo : 'https://via.placeholder.com/100?text=' + (member.name[0] || 'A');
+
+      const photoSrc =
+        member.photo && member.photo !== ".jpg"
+          ? member.photo
+          : "https://via.placeholder.com/100?text=" + (member.name[0] || "A");
 
       memberElement.innerHTML = `
                 <img src="${photoSrc}" alt="${member.name}" class="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-purple-500 object-cover" onerror="this.src='https://via.placeholder.com/100?text=' + ('${member.name}'[0] || 'A')">
                 <h3 class="font-bold text-white">${member.name}</h3>
                 <p class="text-sm text-purple-300">${member.nim}</p>
-                <p class="text-xs text-gray-400 mt-2">"${member.quote || '-'}"</p>
+                <p class="text-xs text-gray-400 mt-2">"${member.quote || "-"}"</p>
             `;
       membersList.appendChild(memberElement);
     });
 
     // Show/hide load more button
-    if(loadMoreBtn) {
-        loadMoreBtn.style.display =
-            visibleMembers < memberData.length ? "inline-block" : "none";
+    if (loadMoreBtn) {
+      loadMoreBtn.style.display =
+        visibleMembers < memberData.length ? "inline-block" : "none";
     }
   }
 
-  if(memberSearch) memberSearch.addEventListener("input", renderMembers);
+  if (memberSearch) memberSearch.addEventListener("input", renderMembers);
 
-  if(loadMoreBtn) {
-      loadMoreBtn.addEventListener("click", () => {
-        visibleMembers += 5;
-        renderMembers();
-      });
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener("click", () => {
+      visibleMembers += 5;
+      renderMembers();
+    });
   }
 
   document.addEventListener("firebase:members", (e) => {
@@ -720,7 +758,7 @@ function setupContactForm() {
   function showNotification(message, type = "success") {
     // Remove existing notifications
     const existingNotifications = document.querySelectorAll(
-      ".contact-notification"
+      ".contact-notification",
     );
     existingNotifications.forEach((notification) => notification.remove());
 
@@ -783,7 +821,7 @@ function setupContactForm() {
 
       // Success response
       showNotification(
-        `Terima kasih ${name}! Pesan Anda telah terkirim. Kami akan segera menghubungi Anda.`
+        `Terima kasih ${name}! Pesan Anda telah terkirim. Kami akan segera menghubungi Anda.`,
       );
 
       // Reset form
@@ -1240,7 +1278,7 @@ function setupScrollAnimations() {
     },
     {
       threshold: 0.1,
-    }
+    },
   );
 
   document.querySelectorAll(".fade-in").forEach((el) => {
@@ -1248,7 +1286,7 @@ function setupScrollAnimations() {
       "opacity-0",
       "translate-y-10",
       "transition-all",
-      "duration-500"
+      "duration-500",
     );
     observer.observe(el);
   });
@@ -1454,7 +1492,7 @@ function setupGlobalSearch() {
     const results = searchData.filter(
       (item) =>
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+        item.description.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
     displaySearchResults(results);
@@ -1550,49 +1588,67 @@ function setupGlobalSearch() {
 
 // Initialize all functions when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
-    createStars();
-    setupMusic();
-    setupMobileMenu();
-    setupSmoothScrolling();
-    setupScheduleTabs();
-    setupGalleryFilter();
-    setupSlideshow();
-    setupCalendar();
-    setupMembers();
-    setupContactForm();
-    setupMaterials();
-    setupGlobalSearch();
-    setupScrollAnimations();
+  createStars();
+  setupMusic();
+  setupMobileMenu();
+  setupSmoothScrolling();
+  setupScheduleTabs();
+  setupGalleryFilter();
+  setupSlideshow();
+  setupCalendar();
+  setupMembers();
+  setupContactForm();
+  setupMaterials();
+  setupGlobalSearch();
+  setupScrollAnimations();
 
-    // ── Firebase Realtime: Override pengurus kelas when DB data arrives ──
-    document.addEventListener('firebase:pengurus', (e) => {
-        const pengurusData = e.detail;
-        if (!pengurusData || !pengurusData.length) return;
+  // ── Firebase Realtime: Override pengurus kelas when DB data arrives ──
+  document.addEventListener("firebase:pengurus", (e) => {
+    const pengurusData = e.detail;
+    if (!pengurusData || !pengurusData.length) return;
 
-        const grid = document.getElementById("pengurusGrid");
-        if (!grid) return;
+    const grid = document.getElementById("pengurusGrid");
+    if (!grid) return;
 
-        grid.innerHTML = pengurusData.map(p => `
+    grid.innerHTML = pengurusData
+      .map(
+        (p) => `
           <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300 fade-in">
-            ${p.photo 
-              ? `<img src="${p.photo}" alt="${p.role}" class="w-32 h-32 rounded-full mx-auto mb-4 border-2 border-purple-500 object-cover" onerror="this.style.display='none'" />` 
-              : `<div class="w-32 h-32 rounded-full mx-auto mb-4 border-2 border-purple-500 flex items-center justify-center bg-gradient-to-r from-purple-500 to-red-500 text-3xl font-bold text-white">${(p.name||'?')[0]}</div>`
+            ${
+              p.photo
+                ? `<img src="${p.photo}" alt="${p.role}" class="w-32 h-32 rounded-full mx-auto mb-4 border-2 border-purple-500 object-cover" onerror="this.style.display='none'" />`
+                : `<div class="w-32 h-32 rounded-full mx-auto mb-4 border-2 border-purple-500 flex items-center justify-center bg-gradient-to-r from-purple-500 to-red-500 text-3xl font-bold text-white">${(p.name || "?")[0]}</div>`
             }
             <h4 class="font-bold text-lg uppercase">${p.name}</h4>
             <p class="text-purple-400 mb-2 font-semibold">${p.role}</p>
             <p class="text-sm text-gray-300 italic">
-              "${p.quote || '-'}"
+              "${p.quote || "-"}"
             </p>
-          </div>`).join('');
-    });
+          </div>`,
+      )
+      .join("");
+  });
 
-    // Jika db-sync selesai duluan sebelum file ini, panggil manual rendering dari variabel penyimpannya
-    if (window._firebasePengurus) {
-        document.dispatchEvent(new CustomEvent('firebase:pengurus', { detail: window._firebasePengurus }));
-    }
+  // Jika db-sync selesai duluan sebelum file ini, panggil manual rendering dari variabel penyimpannya
+  if (window._firebasePengurus) {
+    document.dispatchEvent(
+      new CustomEvent("firebase:pengurus", {
+        detail: window._firebasePengurus,
+      }),
+    );
+  }
 
-    // Activate first schedule tab
-    const firstTab = document.querySelector('.schedule-day[data-day="senin"]');
-    if (firstTab) firstTab.click();
+  // Activate first schedule tab
+  const firstTab = document.querySelector('.schedule-day[data-day="senin"]');
+  if (firstTab) firstTab.click();
 });
 
+// Ensure admin link works on mobile
+document.addEventListener("DOMContentLoaded", () => {
+  const adminLink = document.querySelector(".admin-secret-link");
+  if (adminLink) {
+    adminLink.addEventListener("touchend", () => {
+      window.location.href = "admin.html";
+    });
+  }
+});

@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - TIF-B CyberSquad</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="shortcut icon" href="https://unias.ac.id/public/img/unias.png" type="image/x-icon"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple: #8b5cf6; --purple-light: #a78bfa; --red: #ef4444;
+      --dark: #0f0f1a; --sidebar: #13132a; --card: #1a1a2e;
+      --border: #2a2a4a; --text: #e2e8f0; --muted: #94a3b8;
+      --success: #10b981; --warning: #f59e0b; --info: #3b82f6;
+      --sidebar-w: 260px;
+    }
+    body { font-family: 'Poppins', sans-serif; background: var(--dark); color: var(--text); display: flex; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w); background: var(--sidebar); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh;
+      z-index: 100; transition: transform 0.3s;
+    }
+    .sidebar-logo {
+      padding: 24px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .logo-icon {
+      width: 42px; height: 42px; background: linear-gradient(135deg, var(--purple), var(--red));
+      border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff;
+      flex-shrink: 0;
+    }
+    .logo-text { font-size: 15px; font-weight: 700; line-height: 1.2; }
+    .logo-text span { display: block; font-size: 11px; font-weight: 400; color: var(--muted); }
+
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
+    .nav-section { padding: 8px 16px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #4a4a6a; font-weight: 600; margin-top: 8px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 11px 20px;
+      color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500;
+      transition: all 0.2s; cursor: pointer; border: none; background: none; width: 100%; text-align: left;
+      border-left: 3px solid transparent;
+    }
+    .nav-item:hover { color: var(--text); background: rgba(139,92,246,0.08); border-left-color: rgba(139,92,246,0.3); }
+    .nav-item.active { color: var(--purple-light); background: rgba(139,92,246,0.15); border-left-color: var(--purple); }
+    .nav-item i { width: 18px; text-align: center; font-size: 15px; }
+    .nav-badge { margin-left: auto; background: var(--purple); color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 99px; }
+
+    .sidebar-footer { padding: 16px; border-top: 1px solid var(--border); }
+    .user-info { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.04); }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--red)); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
+    .user-name { font-size: 13px; font-weight: 600; flex: 1; }
+    .user-role { font-size: 11px; color: var(--muted); display: block; }
+    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 4px; transition: color 0.2s; }
+    .logout-btn:hover { color: var(--red); }
+
+    /* MAIN CONTENT */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15,15,26,0.9); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border); padding: 0 28px;
+      height: 64px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-title { font-size: 18px; font-weight: 700; }
+    .topbar-title span { font-size: 12px; font-weight: 400; color: var(--muted); display: block; margin-top: 1px; }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      border: none; cursor: pointer; transition: all 0.2s; font-family: 'Poppins', sans-serif;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--purple), var(--red)); color: #fff; }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,92,246,0.4); }
+    .btn-ghost { background: rgba(255,255,255,0.06); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.1); }
+    .btn-danger { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+    .btn-danger:hover { background: rgba(239,68,68,0.25); }
+    .btn-success { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+    .btn-success:hover { background: rgba(16,185,129,0.25); }
+    .btn-sm { padding: 5px 12px; font-size: 12px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    .content-area { flex: 1; padding: 28px; }
+
+    /* PANELS */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* STAT CARDS */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 20px; display: flex; align-items: center; gap: 16px;
+      transition: all 0.2s;
+    }
+    .stat-card:hover { border-color: rgba(139,92,246,0.3); transform: translateY(-2px); }
+    .stat-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+    }
+    .stat-icon.purple { background: rgba(139,92,246,0.15); color: var(--purple-light); }
+    .stat-icon.red { background: rgba(239,68,68,0.15); color: #fca5a5; }
+    .stat-icon.green { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+    .stat-icon.blue { background: rgba(59,130,246,0.15); color: #93c5fd; }
+    .stat-value { font-size: 24px; font-weight: 700; line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* SECTION CARDS */
+    .section-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      margin-bottom: 20px; overflow: hidden;
+    }
+    .section-header {
+      padding: 18px 24px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .section-title i { color: var(--purple-light); }
+    .section-body { padding: 24px; }
+
+    /* FORM ELEMENTS */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-row.single { grid-template-columns: 1fr; }
+    .form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+    .form-group { margin-bottom: 0; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .form-control {
+      width: 100%; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 11px 14px; color: var(--text);
+      font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; transition: all 0.2s;
+      resize: vertical;
+    }
+    .form-control:focus { border-color: var(--purple); background: rgba(139,92,246,0.06); box-shadow: 0 0 0 3px rgba(139,92,246,0.12); }
+    .form-control::placeholder { color: #3a3a5a; }
+    .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+    /* TABLE */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { padding: 10px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); text-align: left; border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 13px 14px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .member-photo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--purple); }
+    .member-photo-placeholder { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--red)); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; }
+
+    /* TOAST */
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 18px; border-radius: 12px; font-size: 13px; font-weight: 500;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4); min-width: 280px;
+      animation: toastIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      transition: opacity 0.3s;
+    }
+    .toast.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; backdrop-filter: blur(12px); }
+    .toast.error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; backdrop-filter: blur(12px); }
+    .toast.info { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd; backdrop-filter: blur(12px); }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: center; justify-content: center; display: none; backdrop-filter: blur(4px); }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 28px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-size: 16px; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; }
+    .modal-close:hover { color: var(--text); }
+
+    /* LIVE PREVIEW BADGE */
+    .live-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 99px; }
+    .live-dot { width: 6px; height: 6px; background: #10b981; border-radius: 50%; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* TABS */
+    .tab-bar { display: flex; gap: 4px; background: rgba(255,255,255,0.04); border-radius: 12px; padding: 4px; margin-bottom: 20px; }
+    .tab-btn { flex: 1; padding: 9px; border: none; border-radius: 9px; background: none; color: var(--muted); font-size: 13px; font-weight: 500; font-family: 'Poppins', sans-serif; cursor: pointer; transition: all 0.2s; }
+    .tab-btn.active { background: var(--card); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+    /* Mobile sidebar toggle */
+    .hamburger { display: none; background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer; padding: 4px; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+
+    @media (max-width: 768px) {
+      .main { margin-left: 0; }
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .hamburger { display: flex; }
+      .sidebar-overlay.show { display: block; }
+      .form-row { grid-template-columns: 1fr; }
+      .form-row.triple { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .table-wrap { overflow-x: auto; }
+    .empty-state { text-align: center; padding: 40px; color: var(--muted); }
+    .empty-state i { font-size: 40px; margin-bottom: 12px; opacity: 0.3; display: block; }
+    .char-count { font-size: 11px; color: var(--muted); text-align: right; margin-top: 4px; }
+
+    /* PHOTO UPLOAD ZONE */
+    .upload-zone {
+      border: 2px dashed var(--border); border-radius: 12px; padding: 20px;
+      text-align: center; cursor: pointer; transition: all 0.2s;
+      background: rgba(255,255,255,0.02); position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--purple); background: rgba(139,92,246,0.06);
+    }
+    .upload-zone input[type=file] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-icon { font-size: 28px; color: var(--muted); margin-bottom: 8px; display: block; }
+    .upload-text { font-size: 13px; color: var(--muted); }
+    .upload-text strong { color: var(--purple-light); }
+    .upload-hint { font-size: 11px; color: #4a4a6a; margin-top: 4px; }
+
+    .photo-preview {
+      margin-top: 12px; display: none;
+      background: rgba(255,255,255,0.04); border-radius: 10px;
+      padding: 10px; align-items: center; gap: 12px;
+    }
+    .photo-preview.show { display: flex; }
+    .preview-img { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; border: 2px solid var(--purple); }
+    .preview-info { flex: 1; min-width: 0; }
+    .preview-name { font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .preview-size { font-size: 11px; color: var(--muted); }
+    .preview-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; transition: color 0.2s; }
+    .preview-remove:hover { color: var(--red); }
+
+    .upload-progress {
+      margin-top: 10px; display: none;
+      background: rgba(255,255,255,0.04); border-radius: 8px; padding: 10px;
+    }
+    .upload-progress.show { display: block; }
+    .progress-bar {
+      height: 6px; background: rgba(255,255,255,0.08); border-radius: 99px;
+      overflow: hidden; margin-bottom: 6px;
+    }
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--purple), var(--red));
+      border-radius: 99px; width: 0%; transition: width 0.3s;
+    }
+    .progress-text { font-size: 11px; color: var(--muted); text-align: center; }
+
+    .url-divider {
+      display: flex; align-items: center; gap: 10px; margin: 12px 0;
+      color: var(--muted); font-size: 12px;
+    }
+    .url-divider::before, .url-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+    <div class="logo-text">Admin Panel<span>TIF-B CyberSquad</span></div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">Halaman Utama</div>
+    <button class="nav-item active" data-panel="dashboard" onclick="switchPanel('dashboard', this)">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </button>
+
+    <div class="nav-section">Konten Website</div>
+    <button class="nav-item" data-panel="hero" onclick="switchPanel('hero', this)">
+      <i class="fas fa-home"></i> Hero / Beranda
+    </button>
+    <button class="nav-item" data-panel="about" onclick="switchPanel('about', this)">
+      <i class="fas fa-info-circle"></i> Tentang Kami
+    </button>
+    <button class="nav-item" data-panel="members" onclick="switchPanel('members', this)">
+      <i class="fas fa-users"></i> Anggota Kelas
+    </button>
+    <button class="nav-item" data-panel="pengurus" onclick="switchPanel('pengurus', this)">
+      <i class="fas fa-user-tie"></i> Pengurus Kelas
+    </button>
+    <button class="nav-item" data-panel="schedule" onclick="switchPanel('schedule', this)">
+      <i class="fas fa-calendar-alt"></i> Jadwal Kuliah
+    </button>
+    <button class="nav-item" data-panel="gallery" onclick="switchPanel('gallery', this)">
+      <i class="fas fa-images"></i> Galeri
+    </button>
+    <button class="nav-item" data-panel="contact" onclick="switchPanel('contact', this)">
+      <i class="fas fa-phone-alt"></i> Kontak
+    </button>
+    <button class="nav-item" data-panel="music" onclick="switchPanel('music', this)">
+      <i class="fas fa-music"></i> Kelola Musik
+    </button>
+    <button class="nav-item" data-panel="nav" onclick="switchPanel('nav', this)">
+      <i class="fas fa-bars"></i> Navigasi & Footer
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar" id="userInitial">A</div>
+      <div style="flex:1;min-width:0">
+        <div class="user-name" id="userEmail" style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Admin</div>
+        <span class="user-role">Super Administrator</span>
+      </div>
+      <button class="logout-btn" title="Logout" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+      <div>
+        <div class="topbar-title" id="panelTitle">Dashboard</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span class="live-badge"><span class="live-dot"></span>Realtime</span>
+      <a href="index.html" target="_blank" class="btn btn-ghost btn-sm"><i class="fas fa-external-link-alt"></i> Lihat Website</a>
+    </div>
+  </div>
+
+  <div class="content-area">
+
+    <!-- ===== DASHBOARD PANEL ===== -->
+    <div id="panel-dashboard" class="panel active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+          <div><div class="stat-value" id="statMembers">-</div><div class="stat-label">Anggota Kelas</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="fas fa-images"></i></div>
+          <div><div class="stat-value" id="statGallery">-</div><div class="stat-label">Foto Galeri</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-book"></i></div>
+          <div><div class="stat-value" id="statSchedule">-</div><div class="stat-label">Mata Kuliah</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-database"></i></div>
+          <div><div class="stat-value">Live</div><div class="stat-label">Status Database</div></div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-bolt"></i> Akses Cepat</div>
+        </div>
+        <div class="section-body">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+            <button class="btn btn-ghost" onclick="switchPanel('hero', document.querySelector('[data-panel=hero]'))" style="justify-content:flex-start">
+              <i class="fas fa-home" style="color:var(--purple-light)"></i> Edit Beranda
+            </button>
+            <button class="btn btn-ghost" onclick="switchPanel('members', document.querySelector('[data-panel=members]'))" style="justify-content:flex-start">
+              <i class="fas fa-user-plus" style="color:#6ee7b7"></i> Kelola Anggota
+            </button>
+            <button class="btn btn-ghost" onclick="switchPanel('schedule', document.querySelector('[data-panel=schedule]'))" style="justify-content:flex-start">
+              <i class="fas fa-calendar" style="color:#93c5fd"></i> Edit Jadwal
+            </button>
+            <button class="btn btn-ghost" onclick="switchPanel('gallery', document.querySelector('[data-panel=gallery]'))" style="justify-content:flex-start">
+              <i class="fas fa-image" style="color:#fca5a5"></i> Kelola Galeri
+            </button>
+            <button class="btn btn-ghost" onclick="switchPanel('contact', document.querySelector('[data-panel=contact]'))" style="justify-content:flex-start">
+              <i class="fas fa-phone" style="color:var(--warning)"></i> Edit Kontak
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-info-circle"></i> Informasi Admin</div>
+        </div>
+        <div class="section-body" style="color:var(--muted);font-size:13px;line-height:1.8">
+          <p>Selamat datang di <strong style="color:var(--text)">Admin Panel TIF-B CyberSquad</strong>.</p>
+          <br>
+          <p>Semua perubahan yang Anda buat di sini akan <strong style="color:#10b981">langsung terlihat</strong> di website utama secara realtime melalui Firebase Realtime Database.</p>
+          <br>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px">
+            <li><i class="fas fa-check" style="color:#10b981;margin-right:8px"></i>Klik panel di sidebar untuk mulai mengedit</li>
+            <li><i class="fas fa-check" style="color:#10b981;margin-right:8px"></i>Tekan "Simpan" untuk menyimpan perubahan ke database</li>
+            <li><i class="fas fa-check" style="color:#10b981;margin-right:8px"></i>Website akan otomatis update tanpa perlu refresh</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- INISIALISASI DATABASE -->
+      <div class="section-card" style="border-color:rgba(245,158,11,0.3)">
+        <div class="section-header" style="border-color:rgba(245,158,11,0.15)">
+          <div class="section-title"><i class="fas fa-database" style="color:var(--warning)"></i> Inisialisasi Database</div>
+        </div>
+        <div class="section-body">
+          <p style="color:var(--muted);font-size:13px;margin-bottom:16px;line-height:1.7">
+            Jika database Firebase masih <strong style="color:var(--warning)">kosong</strong> (data anggota, jadwal, galeri tidak muncul di admin),
+            klik tombol di bawah untuk mengisi database dengan semua data awal dari website.<br>
+            <span style="color:#4a4a6a;font-size:12px">⚠️ Data yang sudah ada di database <strong>tidak akan</strong> ditimpa.</span>
+          </p>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <button class="btn btn-primary" id="seedBtn" onclick="seedDatabase()" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">
+              <i class="fas fa-database"></i> Inisialisasi Database
+            </button>
+            <span id="seedStatus" style="font-size:13px;color:var(--muted)"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== HERO PANEL ===== -->
+    <div id="panel-hero" class="panel">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-heading"></i> Teks Hero / Beranda</div>
+          <button class="btn btn-primary btn-sm" onclick="saveHero()"><i class="fas fa-save"></i> Simpan</button>
+        </div>
+        <div class="section-body">
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Judul Utama (bisa gunakan &lt;br&gt; untuk baris baru)</label>
+              <textarea class="form-control" id="heroTitle" rows="3" placeholder="Selamat Datang di Kelas TIF-B CyberSquad"></textarea>
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Subtitle</label>
+              <textarea class="form-control" id="heroSubtitle" rows="2" placeholder="Bersama menuju masa depan yang cerah..."></textarea>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Teks Tombol 1</label>
+              <input class="form-control" id="heroBtn1Text" type="text" placeholder="Jelajahi Kelas" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Link Tombol 1</label>
+              <input class="form-control" id="heroBtn1Link" type="text" placeholder="#about" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Teks Tombol 2</label>
+              <input class="form-control" id="heroBtn2Text" type="text" placeholder="Kenali Anggota" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Link Tombol 2</label>
+              <input class="form-control" id="heroBtn2Link" type="text" placeholder="#members" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-images"></i> Foto Slideshow Hero</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddHeroSlide()"><i class="fas fa-plus"></i> Tambah Slide</button>
+        </div>
+        <div class="section-body" style="padding:0">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Pratinjau</th><th>Nama File / URL</th><th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="heroSlidesTableBody">
+                <tr><td colspan="3" class="empty-state"><i class="fas fa-images"></i> Belum ada foto slideshow.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ABOUT PANEL ===== -->
+    <div id="panel-about" class="panel">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-info-circle"></i> Tentang Kami</div>
+          <button class="btn btn-primary btn-sm" onclick="saveAbout()"><i class="fas fa-save"></i> Simpan</button>
+        </div>
+        <div class="section-body">
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Paragraf Sejarah 1</label>
+              <textarea class="form-control" id="aboutHistory1" rows="4"></textarea>
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Paragraf Sejarah 2</label>
+              <textarea class="form-control" id="aboutHistory2" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Visi</label>
+              <textarea class="form-control" id="aboutVisi" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Misi (bisa gunakan &lt;br&gt; untuk baris baru)</label>
+              <textarea class="form-control" id="aboutMisi" rows="4"></textarea>
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Motto Kelas</label>
+              <textarea class="form-control" id="aboutMotto" rows="2"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:20px">
+            <label class="form-label">Foto Bagian Tentang Kami</label>
+            <div class="upload-zone" id="aboutUploadZone">
+              <input type="file" id="aboutFileInput" accept="image/*" onchange="handleFileSelect('about', this)" />
+              <i class="fas fa-cloud-upload-alt upload-icon"></i>
+              <div class="upload-text"><strong>Klik untuk ganti foto</strong> atau seret ke sini</div>
+            </div>
+            <div class="photo-preview" id="aboutPreview">
+              <img class="preview-img" id="aboutPreviewImg" src="" alt="Preview" />
+              <div class="preview-info">
+                <div class="preview-name" id="aboutPreviewName"></div>
+                <div class="preview-size" id="aboutPreviewSize"></div>
+              </div>
+              <button class="preview-remove" onclick="clearPhoto('about')" title="Hapus"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="upload-progress" id="aboutUploadProgress">
+              <div class="progress-bar"><div class="progress-fill" id="aboutProgressFill"></div></div>
+            </div>
+            <div class="url-divider">atau gunakan URL / nama file lokal</div>
+            <input class="form-control" id="aboutPhotoUrl" type="text" placeholder="https://... atau Boy.jpg" />
+            <input type="hidden" id="aboutPhotoSaved" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MEMBERS PANEL ===== -->
+    <div id="panel-members" class="panel">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-users"></i> Anggota Kelas (<span id="memberCount">0</span>)</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddMember()"><i class="fas fa-plus"></i> Tambah Anggota</button>
+        </div>
+        <div class="section-body" style="padding:0">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Foto</th><th>Nama</th><th>NIM</th><th>Kutipan</th><th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="membersTableBody">
+                <tr><td colspan="5" class="empty-state"><i class="fas fa-spinner fa-spin"></i>Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PENGURUS KELAS PANEL ===== -->
+    <div id="panel-pengurus" class="panel">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-user-tie"></i> Daftar Pengurus Kelas</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddPengurus()"><i class="fas fa-plus"></i> Tambah Pengurus</button>
+        </div>
+        <div class="section-body" style="padding:0">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr><th>Foto</th><th>Nama Lengkap</th><th>Jabatan</th><th>Motivasi / Kutipan</th><th>Aksi</th></tr>
+              </thead>
+              <tbody id="pengurusTableBody">
+                <tr><td colspan="5" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Memuat...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCHEDULE PANEL ===== -->
+    <div id="panel-schedule" class="panel">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-calendar-alt"></i> Jadwal Kuliah</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddSchedule()"><i class="fas fa-plus"></i> Tambah Jadwal</button>
+        </div>
+        <div class="section-body" style="padding:0">
+          <div class="tab-bar" style="margin:16px">
+            <button class="tab-btn active" onclick="filterSchedule('senin',this)">Senin</button>
+            <button class="tab-btn" onclick="filterSchedule('selasa',this)">Selasa</button>
+            <button class="tab-btn" onclick="filterSchedule('rabu',this)">Rabu</button>
+            <button class="tab-btn" onclick="filterSchedule('kamis',this)">Kamis</button>
+            <button class="tab-btn" onclick="filterSchedule('jumat',this)">Jumat</button>
+            <button class="tab-btn" onclick="filterSchedule('sabtu',this)">Sabtu</button>
+          </div>
+          <div class="table-wrap" style="padding:0 0 16px">
+            <table class="data-table">
+              <thead>
+                <tr><th>Waktu</th><th>Mata Kuliah</th><th>Dosen</th><th>Ruangan</th><th>Aksi</th></tr>
+              </thead>
+              <tbody id="scheduleTableBody">
+                <tr><td colspan="5" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Memuat...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== GALLERY PANEL ===== -->
+    <div id="panel-gallery" class="panel">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-images"></i> Galeri Kegiatan</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddGallery()"><i class="fas fa-plus"></i> Tambah Foto</button>
+        </div>
+        <div class="section-body" style="padding:0">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr><th>Pratinjau</th><th>Judul</th><th>Kategori</th><th>Tanggal</th><th>Aksi</th></tr>
+              </thead>
+              <tbody id="galleryTableBody">
+                <tr><td colspan="5" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Memuat...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CONTACT PANEL ===== -->
+    <div id="panel-contact" class="panel">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-phone-alt"></i> Informasi Kontak</div>
+          <button class="btn btn-primary btn-sm" onclick="saveContact()"><i class="fas fa-save"></i> Simpan</button>
+        </div>
+        <div class="section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-control" id="contactEmail" type="email" placeholder="tifbfamily@gmail.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nomor WhatsApp (tampilan)</label>
+              <input class="form-control" id="contactWA" type="text" placeholder="+62 822-6108-1469" />
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Link WhatsApp (wa.me/...)</label>
+              <input class="form-control" id="contactWALink" type="text" placeholder="https://wa.me/6282261081469" />
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Alamat</label>
+              <input class="form-control" id="contactAddress" type="text" placeholder="Universitas Nias, Kota Gunungsitoli..." />
+            </div>
+          </div>
+            <div class="form-group">
+              <label class="form-label">Jam Kerja (bisa gunakan &lt;br&gt; untuk baris baru)</label>
+              <textarea class="form-control" id="contactHours" rows="3" placeholder="Senin - Jumat: 08:00 - 16:00"></textarea>
+            </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Link Instagram Kampus</label>
+              <input class="form-control" id="contactIG" type="text" />
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Link YouTube Kampus</label>
+              <input class="form-control" id="contactYT" type="text" />
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Link Facebook Kampus</label>
+              <input class="form-control" id="contactFB" type="text" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== NAV & FOOTER PANEL ===== -->
+    <div id="panel-nav" class="panel">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-bars"></i> Navigasi</div>
+          <button class="btn btn-primary btn-sm" onclick="saveNav()"><i class="fas fa-save"></i> Simpan</button>
+        </div>
+        <div class="section-body">
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Teks Logo / Nama Website</label>
+              <input class="form-control" id="navLogoText" type="text" placeholder="TIF-B CyberSquad" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-copyright"></i> Footer</div>
+          <button class="btn btn-primary btn-sm" onclick="saveFooter()"><i class="fas fa-save"></i> Simpan</button>
+        </div>
+        <div class="section-body">
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Teks Copyright</label>
+              <input class="form-control" id="footerCopyright" type="text" placeholder="© 2024 Kelas TIF-B CyberSquad." />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nama Developer</label>
+              <input class="form-control" id="footerDevName" type="text" placeholder="Jefrin Telaumbanua" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Peran Developer</label>
+              <input class="form-control" id="footerDevRole" type="text" placeholder="Programmer TIF-B CyberSquad" />
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:16px">
+            <label class="form-label">Foto Developer</label>
+            <div class="upload-zone" id="footerUploadZone">
+              <input type="file" id="footerFileInput" accept="image/*" onchange="handleFileSelect('footer', this)" />
+              <i class="fas fa-user-circle upload-icon"></i>
+              <div class="upload-text"><strong>Klik untuk ganti foto</strong> atau seret ke sini</div>
+            </div>
+            <div class="photo-preview" id="footerPreview">
+              <img class="preview-img" id="footerPreviewImg" src="" alt="Preview" />
+              <div class="preview-info">
+                <div class="preview-name" id="footerPreviewName"></div>
+                <div class="preview-size" id="footerPreviewSize"></div>
+              </div>
+              <button class="preview-remove" onclick="clearPhoto('footer')" title="Hapus"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="upload-progress" id="footerUploadProgress">
+              <div class="progress-bar"><div class="progress-fill" id="footerProgressFill"></div></div>
+            </div>
+            <div class="url-divider">atau gunakan URL / nama file lokal</div>
+            <input class="form-control" id="footerPhotoUrl" type="text" placeholder="https://... atau programmer.jpg" />
+            <input type="hidden" id="footerPhotoSaved" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: KELOLA MUSIK -->
+    <div id="panel-music" class="panel">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fas fa-music"></i> Daftar Musik Latar</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddMusic()">
+            <i class="fas fa-plus"></i> Tambah Lagu
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Judul Lagu</th>
+                <th>Penyanyi / Artis</th>
+                <th>Sumber Audio</th>
+                <th width="100">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="musicTableBody">
+              <tr>
+                <td colspan="4">
+                  <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i> Memuat daftar musik...
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-area -->
+</main>
+
+<!-- MODAL: Add/Edit Member -->
+<div class="modal-overlay" id="memberModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="memberModalTitle">Tambah Anggota</div>
+      <button class="modal-close" onclick="closeModal('memberModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <input type="hidden" id="memberEditId" />
+    <input type="hidden" id="memberPhoto" />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap</label>
+        <input class="form-control" id="memberName" type="text" placeholder="Nama anggota" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">NIM</label>
+        <input class="form-control" id="memberNim" type="text" placeholder="242301xxx" />
+      </div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group">
+        <label class="form-label">Kutipan Motivasi</label>
+        <input class="form-control" id="memberQuote" type="text" placeholder="Kutipan singkat..." />
+      </div>
+    </div>
+
+    <!-- FOTO UPLOAD -->
+    <div class="form-group" style="margin-bottom:0">
+      <label class="form-label">Foto Profil</label>
+      <div class="upload-zone" id="memberUploadZone">
+        <input type="file" id="memberFileInput" accept="image/*" onchange="handleFileSelect('member', this)" />
+        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+        <div class="upload-text"><strong>Klik untuk pilih foto</strong> atau seret ke sini</div>
+        <div class="upload-hint">JPG, PNG, WEBP — maks. 5 MB</div>
+      </div>
+      <div class="photo-preview" id="memberPreview">
+        <img class="preview-img" id="memberPreviewImg" src="" alt="Preview" />
+        <div class="preview-info">
+          <div class="preview-name" id="memberPreviewName"></div>
+          <div class="preview-size" id="memberPreviewSize"></div>
+        </div>
+        <button class="preview-remove" onclick="clearPhoto('member')" title="Hapus foto"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="upload-progress" id="memberUploadProgress">
+        <div class="progress-bar"><div class="progress-fill" id="memberProgressFill"></div></div>
+        <div class="progress-text" id="memberProgressText">Mengupload...</div>
+      </div>
+      <div class="url-divider">atau gunakan URL / nama file lokal</div>
+      <input class="form-control" id="memberPhotoUrl" type="text" placeholder="https://... atau nama-file.jpg" style="margin-top:0" />
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('memberModal')">Batal</button>
+      <button class="btn btn-primary" id="memberSaveBtn" onclick="saveMember()"><i class="fas fa-save"></i> Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add/Edit Schedule -->
+<div class="modal-overlay" id="scheduleModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="scheduleModalTitle">Tambah Jadwal</div>
+      <button class="modal-close" onclick="closeModal('scheduleModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <input type="hidden" id="scheduleEditId" />
+    <div class="form-row single">
+      <div class="form-group">
+        <label class="form-label">Hari</label>
+        <select class="form-control" id="scheduleDay">
+          <option value="senin">Senin</option>
+          <option value="selasa">Selasa</option>
+          <option value="rabu">Rabu</option>
+          <option value="jumat">Jumat</option>
+          <option value="sabtu">Sabtu</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Jam Mulai</label>
+        <input class="form-control" id="scheduleStart" type="time" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Jam Selesai</label>
+        <input class="form-control" id="scheduleEnd" type="time" />
+      </div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group">
+        <label class="form-label">Mata Kuliah</label>
+        <input class="form-control" id="scheduleCourse" type="text" placeholder="Nama mata kuliah" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Dosen</label>
+        <input class="form-control" id="scheduleLecturer" type="text" placeholder="Nama dosen" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ruangan</label>
+        <input class="form-control" id="scheduleRoom" type="text" placeholder="Ruang 01" />
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('scheduleModal')">Batal</button>
+      <button class="btn btn-primary" onclick="saveSchedule()"><i class="fas fa-save"></i> Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add/Edit Gallery -->
+<div class="modal-overlay" id="galleryModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="galleryModalTitle">Tambah Foto Galeri</div>
+      <button class="modal-close" onclick="closeModal('galleryModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <input type="hidden" id="galleryEditId" />
+    <input type="hidden" id="galleryPhoto" />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Judul Foto</label>
+        <input class="form-control" id="galleryTitle" type="text" placeholder="Judul kegiatan" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tanggal</label>
+        <input class="form-control" id="galleryDate" type="text" placeholder="20 Mei 2025" />
+      </div>
+    </div>
+
+    <!-- FOTO UPLOAD -->
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">Upload Foto</label>
+      <div class="upload-zone" id="galleryUploadZone">
+        <input type="file" id="galleryFileInput" accept="image/*" onchange="handleFileSelect('gallery', this)" />
+        <i class="fas fa-image upload-icon"></i>
+        <div class="upload-text"><strong>Klik untuk pilih foto</strong> atau seret ke sini</div>
+        <div class="upload-hint">JPG, PNG, WEBP — maks. 10 MB</div>
+      </div>
+      <div class="photo-preview" id="galleryPreview">
+        <img class="preview-img" id="galleryPreviewImg" src="" alt="Preview" style="width:80px;height:60px;border-radius:8px" />
+        <div class="preview-info">
+          <div class="preview-name" id="galleryPreviewName"></div>
+          <div class="preview-size" id="galleryPreviewSize"></div>
+        </div>
+        <button class="preview-remove" onclick="clearPhoto('gallery')" title="Hapus foto"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="upload-progress" id="galleryUploadProgress">
+        <div class="progress-bar"><div class="progress-fill" id="galleryProgressFill"></div></div>
+        <div class="progress-text" id="galleryProgressText">Mengupload...</div>
+      </div>
+      <div class="url-divider">atau gunakan URL / nama file lokal</div>
+      <input class="form-control" id="galleryPhotoUrl" type="text" placeholder="https://... atau nama-file.jpg" style="margin-top:0" />
+    </div>
+
+    <div class="form-row single">
+      <div class="form-group">
+        <label class="form-label">Kategori</label>
+        <select class="form-control" id="galleryCategory">
+          <option value="all">Semua</option>
+          <option value="class">Foto Kelas</option>
+          <option value="event">Excellent</option>
+          <option value="study">Studi</option>
+          <option value="social">Sosial</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('galleryModal')">Batal</button>
+      <button class="btn btn-primary" id="gallerySaveBtn" onclick="saveGalleryItem()"><i class="fas fa-save"></i> Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add/Edit Pengurus Kelas -->
+<div class="modal-overlay" id="pengurusModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="pengurusModalTitle">Tambah Pengurus</div>
+      <button class="modal-close" onclick="closeModal('pengurusModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <input type="hidden" id="pengurusEditId" />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap</label>
+        <input class="form-control" id="pengurusName" type="text" placeholder="Nama pengurus" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Jabatan</label>
+        <input class="form-control" id="pengurusRole" type="text" placeholder="Contoh: Ketua Kelas" />
+      </div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group">
+        <label class="form-label">Kutipan / Motto</label>
+        <input class="form-control" id="pengurusQuote" type="text" placeholder="Kutipan singkat..." />
+      </div>
+    </div>
+    <input type="hidden" id="pengurusPhoto" />
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">Upload Foto</label>
+      <div class="upload-zone" id="pengurusUploadZone">
+        <input type="file" id="pengurusFileInput" accept="image/*" onchange="handleFileSelect('pengurus', this)" />
+        <i class="fas fa-image upload-icon"></i>
+        <div class="upload-text"><strong>Klik untuk pilih foto</strong> atau seret ke sini</div>
+        <div class="upload-hint">JPG, PNG, WEBP — maks. 10 MB</div>
+      </div>
+      <div class="photo-preview" id="pengurusPreview">
+        <img class="preview-img" id="pengurusPreviewImg" src="" alt="Preview" style="width:56px;height:56px;border-radius:8px" />
+        <div class="preview-info">
+          <div class="preview-name" id="pengurusPreviewName"></div>
+          <div class="preview-size" id="pengurusPreviewSize"></div>
+        </div>
+        <button class="preview-remove" onclick="clearPhoto('pengurus')" title="Hapus foto"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="upload-progress" id="pengurusUploadProgress">
+        <div class="progress-bar"><div class="progress-fill" id="pengurusProgressFill"></div></div>
+        <div class="progress-text" id="pengurusProgressText">Mengupload...</div>
+      </div>
+      <div class="url-divider">atau gunakan URL / nama file lokal</div>
+      <input class="form-control" id="pengurusPhotoUrl" type="text" placeholder="https://..." style="margin-top:0" />
+    </div>
+    <div class="form-actions mt-4">
+      <button class="btn btn-ghost" onclick="closeModal('pengurusModal')">Batal</button>
+      <button class="btn btn-primary" id="pengurusSaveBtn" onclick="savePengurus()"><i class="fas fa-save"></i> Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add/Edit Music -->
+<div class="modal-overlay" id="musicModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="musicModalTitle">Tambah Musik Latar</div>
+      <button class="modal-close" onclick="closeModal('musicModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <input type="hidden" id="musicEditId" />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Judul Lagu</label>
+        <input class="form-control" id="musicTitle" type="text" placeholder="Contoh: A Mortal Music" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Penyanyi / Artis</label>
+        <input class="form-control" id="musicArtist" type="text" placeholder="Nama penyanyi" />
+      </div>
+    </div>
+    <input type="hidden" id="musicAudio" />
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">Upload File Audio (.mp3 / .wav)</label>
+      <div class="upload-zone" id="musicUploadZone">
+        <input type="file" id="musicFileInput" accept="audio/*" onchange="handleFileSelect('music', this)" />
+        <i class="fas fa-music upload-icon"></i>
+        <div class="upload-text"><strong>Klik untuk pilih audio</strong> atau seret ke sini</div>
+        <div class="upload-hint">MP3, WAV, OGG — maks. 15 MB</div>
+      </div>
+      <div class="photo-preview" id="musicPreview">
+        <i class="fas fa-file-audio preview-img" style="color:var(--purple); display:flex; align-items:center; justify-content:center; font-size: 24px;"></i>
+        <div class="preview-info">
+          <div class="preview-name" id="musicPreviewName"></div>
+          <div class="preview-size" id="musicPreviewSize"></div>
+        </div>
+        <button class="preview-remove" onclick="clearPhoto('music')" title="Hapus audio"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="upload-progress" id="musicUploadProgress">
+        <div class="progress-bar"><div class="progress-fill" id="musicProgressFill"></div></div>
+        <div class="progress-text" id="musicProgressText">Mengupload...</div>
+      </div>
+      <div class="url-divider">atau gunakan URL audio eksternal langsung</div>
+      <input class="form-control" id="musicAudioUrl" type="text" placeholder="https://..." style="margin-top:0" />
+    </div>
+    <div class="form-actions mt-4">
+      <button class="btn btn-ghost" onclick="closeModal('musicModal')">Batal</button>
+      <button class="btn btn-primary" id="musicSaveBtn" onclick="saveMusic()"><i class="fas fa-save"></i> Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Hero Slide -->
+<div class="modal-overlay" id="heroSlideModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Tambah Slide Hero</div>
+      <button class="modal-close" onclick="closeModal('heroSlideModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <input type="hidden" id="heroSlideEditId" />
+    <div class="form-group">
+      <label class="form-label">Foto Slide</label>
+      <div class="upload-zone" id="heroSlideUploadZone">
+        <input type="file" id="heroSlideFileInput" accept="image/*" onchange="handleFileSelect('heroSlide', this)" />
+        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+        <div class="upload-text"><strong>Klik untuk pilih foto</strong> atau seret ke sini</div>
+      </div>
+      <div class="photo-preview" id="heroSlidePreview">
+        <img class="preview-img" id="heroSlidePreviewImg" src="" alt="Preview" />
+        <div class="preview-info">
+          <div class="preview-name" id="heroSlidePreviewName"></div>
+          <div class="preview-size" id="heroSlidePreviewSize"></div>
+        </div>
+        <button class="preview-remove" onclick="clearPhoto('heroSlide')" title="Hapus"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="upload-progress" id="heroSlideUploadProgress">
+        <div class="progress-bar"><div class="progress-fill" id="heroSlideProgressFill"></div></div>
+      </div>
+      <div class="url-divider">atau gunakan URL / nama file lokal</div>
+      <input class="form-control" id="heroSlidePhotoUrl" type="text" placeholder="https://... atau foto.jpg" />
+    </div>
+    <div class="form-actions mt-4">
+      <button class="btn btn-ghost" onclick="closeModal('heroSlideModal')">Batal</button>
+      <button class="btn btn-primary" id="heroSlideSaveBtn" onclick="saveHeroSlide()"><i class="fas fa-save"></i> Tambah Slide</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="seed-data.js"></script>
+<script src="admin.js?v=6"></script>
+</body>
+</html>

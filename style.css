@@ -1,0 +1,260 @@
+@keyframes twinkle {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.star {
+  position: absolute;
+  background-color: white;
+  border-radius: 50%;
+  animation: twinkle 7s infinite;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #0a0a0a;
+  color: #e2e8f0;
+  position: relative;
+  overflow-x: hidden;
+}
+
+#stars-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none; /* KRITIS: Mencegah bintang memblokir klik/touch */
+}
+
+/* Pastikan footer always clickable */
+footer {
+  position: relative;
+  z-index: 50;
+  padding-bottom: 80px !important; /* Prevent overlap with mobile floating buttons like music player */
+}
+
+.menu-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-item::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff4d4d, #f0abfc);
+  transition: width 0.3s;
+}
+
+.menu-item:hover::after {
+  width: 100%;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #ff4d4d, #f0abfc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(255, 77, 77, 0.2);
+}
+
+.slide-in {
+  animation: slideIn 0.5s forwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.toggle-checkbox:checked {
+  right: 0;
+  border-color: #f0abfc;
+}
+
+.toggle-checkbox:checked + .toggle-label {
+  background: linear-gradient(90deg, #ff4d4d, #f0abfc);
+}
+
+/* Music Player Wrapper - Always fixed on screen */
+#musicPlayerWrapper {
+  position: fixed !important;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 9999 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* Ensure it won't be moved/hidden by scroll or transform/opacity of parents */
+  transform: none !important;
+  will-change: auto;
+}
+
+/* Music Player Panel - initial hidden state and transition */
+#musicPlayer {
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: bottom right;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
+
+#musicPlayer.show {
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Rotating music icon animation */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.music-playing .fa-music {
+  animation: spin 3s linear infinite;
+}
+
+/* Pulsing play button when playing */
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+}
+
+.music-playing-btn {
+  animation: pulse-ring 2s infinite;
+}
+
+/* Music Player Styles */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-track {
+  background: #374151;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(90deg, #8b5cf6, #ef4444);
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+.slider::-moz-range-track {
+  background: #374151;
+  height: 4px;
+  border-radius: 2px;
+  border: none;
+}
+
+.slider::-moz-range-thumb {
+  background: linear-gradient(90deg, #8b5cf6, #ef4444);
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Music Player Animation */
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.music-playing {
+  animation: pulse 2s infinite;
+}
+
+/* Admin link di footer */
+.admin-secret-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #7c7cb1;
+  text-decoration: none;
+  background: rgba(139, 92, 246, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 100;
+}
+.admin-secret-link:hover,
+.admin-secret-link:active,
+.admin-secret-link:focus {
+  color: #a78bfa;
+  border-color: rgba(139, 92, 246, 0.5);
+  background: rgba(139, 92, 246, 0.08);
+}

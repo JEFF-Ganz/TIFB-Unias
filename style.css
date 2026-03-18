@@ -131,7 +131,9 @@ footer {
   opacity: 0;
   pointer-events: none;
   transform-origin: bottom right;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+  transition:
+    transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    opacity 0.3s ease;
 }
 
 #musicPlayer.show {
@@ -142,8 +144,12 @@ footer {
 
 /* Rotating music icon animation */
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .music-playing .fa-music {
@@ -152,9 +158,18 @@ footer {
 
 /* Pulsing play button when playing */
 @keyframes pulse-ring {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+  }
 }
 
 .music-playing-btn {
@@ -250,11 +265,62 @@ footer {
   -webkit-tap-highlight-color: transparent;
   position: relative;
   z-index: 100;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .admin-secret-link:hover,
 .admin-secret-link:active,
 .admin-secret-link:focus {
   color: #a78bfa;
-  border-color: rgba(139, 92, 246, 0.5);
-  background: rgba(139, 92, 246, 0.08);
+  border-color: rgba(139, 92, 246, 0.6);
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.15),
+    rgba(168, 85, 247, 0.1)
+  );
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
+  transform: translateY(-1px);
 }
+
+/* Admin button in navigation */
+.admin-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #7c7cb1;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.05));
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.1);
+}
+
+.admin-nav-btn:hover,
+.admin-nav-btn:active,
+.admin-nav-btn:focus {
+  color: #a78bfa;
+  border-color: rgba(139, 92, 246, 0.6);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(168, 85, 247, 0.1));
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 0; /* Remove padding since footer is not fixed */
+  }
+
+  #musicPlayerWrapper {
+    bottom: 20px !important; /* Normal position */
+  }

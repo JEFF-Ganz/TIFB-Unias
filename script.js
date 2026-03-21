@@ -288,7 +288,7 @@ function setupScheduleTabs() {
 
   document.addEventListener("firebase:schedule", (e) => {
     const schedules = e.detail || [];
-    const days = ["senin", "selasa", "rabu", "kamis", "Jumat", "Sabtu"];
+    const days = ["senin", "selasa", "rabu", "kamis", "jumat", "sabtu"];
     days.forEach((day) => {
       const table = document.getElementById(`${day}-schedule`);
       if (table) {
@@ -1389,6 +1389,12 @@ function setupGlobalSearch() {
     {
       type: "schedule",
       title: "Rabu",
+      url: "#schedule",
+      description: "Bahasa Inggris, Algoritma & Pemrograman Lanjutan",
+    },
+    {
+      type: "schedule",
+      title: "kamis",
       url: "#schedule",
       description: "Bahasa Inggris, Algoritma & Pemrograman Lanjutan",
     },
